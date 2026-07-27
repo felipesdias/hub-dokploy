@@ -1,0 +1,8 @@
+hub-dokploy
+*.exe
+*.dll
+*.so
+*.dylib
+*.test
+*.out
+test_configs/

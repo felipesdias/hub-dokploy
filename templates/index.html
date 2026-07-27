@@ -1,0 +1,556 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dokploy Applications Hub</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-gradient: linear-gradient(135deg, #0f172a 0%, #020617 100%);
+            --card-bg: rgba(30, 41, 59, 0.7);
+            --card-border: rgba(255, 255, 255, 0.08);
+            --card-hover-border: rgba(99, 102, 241, 0.5);
+            --card-glow: rgba(99, 102, 241, 0.15);
+            --primary: #6366f1;
+            --primary-hover: #4f46e5;
+            --accent: #38bdf8;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --badge-https-bg: rgba(16, 185, 129, 0.15);
+            --badge-https-color: #34d399;
+            --badge-https-border: rgba(52, 211, 153, 0.3);
+            --badge-http-bg: rgba(245, 158, 11, 0.15);
+            --badge-http-color: #fbbf24;
+            --badge-http-border: rgba(251, 191, 36, 0.3);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Outfit', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background: var(--bg-gradient);
+            color: var(--text-main);
+            min-height: 100vh;
+            padding: 2.5rem 1.5rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1200px;
+        }
+
+        header {
+            margin-bottom: 2.5rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            position: relative;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .brand-icon {
+            width: 42px;
+            height: 42px;
+            background: linear-gradient(135deg, #6366f1, #38bdf8);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 0 20px rgba(99, 102, 241, 0.4);
+        }
+
+        .brand-icon svg {
+            width: 24px;
+            height: 24px;
+            fill: #ffffff;
+        }
+
+        h1 {
+            font-size: 2.25rem;
+            font-weight: 700;
+            background: linear-gradient(to right, #ffffff, #cbd5e1);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: -0.02em;
+        }
+
+        .subtitle {
+            color: var(--text-muted);
+            font-size: 1rem;
+            font-weight: 400;
+            max-width: 500px;
+        }
+
+        .stats-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-top: 1rem;
+            padding: 0.35rem 0.85rem;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 9999px;
+            font-size: 0.875rem;
+            color: var(--accent);
+        }
+
+        .controls {
+            display: flex;
+            gap: 1rem;
+            width: 100%;
+            max-width: 600px;
+            margin-bottom: 2.5rem;
+        }
+
+        .search-box {
+            position: relative;
+            flex: 1;
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 18px;
+            height: 18px;
+            stroke: var(--text-muted);
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 0.85rem 1rem 0.85rem 2.8rem;
+            background: rgba(15, 23, 42, 0.6);
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--card-border);
+            border-radius: 12px;
+            color: var(--text-main);
+            font-size: 0.95rem;
+            outline: none;
+            transition: all 0.25s ease;
+        }
+
+        .search-input:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
+            background: rgba(15, 23, 42, 0.8);
+        }
+
+        .refresh-btn {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--card-border);
+            color: var(--text-main);
+            padding: 0.85rem 1.2rem;
+            border-radius: 12px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.95rem;
+            font-weight: 500;
+            transition: all 0.2s ease;
+        }
+
+        .refresh-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: rgba(255, 255, 255, 0.2);
+            transform: translateY(-1px);
+        }
+
+        .apps-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+            gap: 1.5rem;
+            width: 100%;
+        }
+
+        .app-card {
+            background: var(--card-bg);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid var(--card-border);
+            border-radius: 16px;
+            padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .app-card:hover {
+            transform: translateY(-4px);
+            border-color: var(--card-hover-border);
+            box-shadow: 0 12px 30px var(--card-glow);
+        }
+
+        .app-header {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .app-info {
+            display: flex;
+            align-items: center;
+            gap: 0.85rem;
+        }
+
+        .app-avatar {
+            width: 44px;
+            height: 44px;
+            border-radius: 12px;
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.2), rgba(56, 189, 248, 0.2));
+            border: 1px solid rgba(99, 102, 241, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.15rem;
+            font-weight: 700;
+            color: var(--accent);
+            text-transform: uppercase;
+            flex-shrink: 0;
+        }
+
+        .app-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--text-main);
+            line-height: 1.3;
+        }
+
+        .badge-protocol {
+            padding: 0.25rem 0.6rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            letter-spacing: 0.03em;
+            text-transform: uppercase;
+            border: 1px solid;
+            flex-shrink: 0;
+        }
+
+        .badge-https {
+            background: var(--badge-https-bg);
+            color: var(--badge-https-color);
+            border-color: var(--badge-https-border);
+        }
+
+        .badge-http {
+            background: var(--badge-http-bg);
+            color: var(--badge-http-color);
+            border-color: var(--badge-http-border);
+        }
+
+        .domains-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.6rem;
+            margin-bottom: 1.25rem;
+        }
+
+        .domain-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: rgba(15, 23, 42, 0.5);
+            padding: 0.6rem 0.85rem;
+            border-radius: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            font-size: 0.9rem;
+        }
+
+        .domain-link {
+            color: #e2e8f0;
+            text-decoration: none;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+            transition: color 0.2s ease;
+        }
+
+        .domain-link:hover {
+            color: var(--accent);
+            text-decoration: underline;
+        }
+
+        .copy-btn {
+            background: transparent;
+            border: none;
+            color: var(--text-muted);
+            cursor: pointer;
+            padding: 0.25rem;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+        }
+
+        .copy-btn:hover {
+            color: var(--text-main);
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .app-footer {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding-top: 0.85rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.06);
+            margin-top: auto;
+        }
+
+        .service-tag {
+            font-size: 0.78rem;
+            color: var(--text-muted);
+            display: flex;
+            align-items: center;
+            gap: 0.35rem;
+        }
+
+        .open-btn {
+            background: linear-gradient(135deg, var(--primary), var(--primary-hover));
+            color: #ffffff;
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.25);
+        }
+
+        .open-btn:hover {
+            opacity: 0.95;
+            transform: scale(1.02);
+            box-shadow: 0 6px 16px rgba(99, 102, 241, 0.4);
+        }
+
+        .empty-state {
+            grid-column: 1 / -1;
+            text-align: center;
+            padding: 4rem 2rem;
+            background: var(--card-bg);
+            border: 1px dashed var(--card-border);
+            border-radius: 16px;
+            color: var(--text-muted);
+        }
+
+        .empty-state svg {
+            width: 48px;
+            height: 48px;
+            stroke: var(--text-muted);
+            margin-bottom: 1rem;
+            opacity: 0.6;
+        }
+
+        .empty-state h3 {
+            font-size: 1.25rem;
+            color: var(--text-main);
+            margin-bottom: 0.5rem;
+        }
+
+        footer {
+            margin-top: auto;
+            padding-top: 3rem;
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            text-align: center;
+        }
+
+        footer a {
+            color: var(--accent);
+            text-decoration: none;
+        }
+
+        @media (max-width: 640px) {
+            body {
+                padding: 1.5rem 1rem;
+            }
+            .controls {
+                flex-direction: column;
+            }
+            .apps-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="brand">
+                <div class="brand-icon">
+                    <svg viewBox="0 0 24 24">
+                        <path d="M4 6a2 2 0 012-2h12a2 2 0 012 2v12a2 2 0 01-2 2H6a2 2 0 01-2-2V6zm3 2a1 1 0 000 2h10a1 1 0 100-2H7zm0 4a1 1 0 100 2h7a1 1 0 100-2H7zm0 4a1 1 0 100 2h4a1 1 0 100-2H7z"/>
+                    </svg>
+                </div>
+                <h1>Dokploy Applications Hub</h1>
+            </div>
+            <p class="subtitle">Atalho para todas as aplicações deployadas via Dokploy com domínios configurados</p>
+            <div class="stats-badge">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <path d="M12 6v6l4 2"></path>
+                </svg>
+                <span id="app-count">{{len .Apps}} Aplicações Encontradas</span>
+            </div>
+        </header>
+
+        <div class="controls">
+            <div class="search-box">
+                <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke-width="2">
+                    <circle cx="11" cy="11" r="8"></circle>
+                    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                </svg>
+                <input type="text" id="search-input" class="search-input" placeholder="Buscar aplicação por nome ou domínio..." oninput="filterApps()">
+            </div>
+            <button class="refresh-btn" onclick="window.location.reload()">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M23 4v6h-6"></path>
+                    <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path>
+                </svg>
+                Atualizar
+            </button>
+        </div>
+
+        <div class="apps-grid" id="apps-grid">
+            {{if .Apps}}
+                {{range .Apps}}
+                <div class="app-card" data-name="{{.Name}}" data-domains="{{range .Domains}}{{.}} {{end}}">
+                    <div>
+                        <div class="app-header">
+                            <div class="app-info">
+                                <div class="app-avatar">{{slice .Name 0 1}}</div>
+                                <div class="app-title">{{.Name}}</div>
+                            </div>
+                            <span class="badge-protocol {{if .HasTLS}}badge-https{{else}}badge-http{{end}}">
+                                {{if .HasTLS}}HTTPS{{else}}HTTP{{end}}
+                            </span>
+                        </div>
+
+                        <div class="domains-list">
+                            {{$protocol := .Protocol}}
+                            {{range .Domains}}
+                            <div class="domain-item">
+                                <a href="{{$protocol}}://{{.}}" target="_blank" rel="noopener noreferrer" class="domain-link">
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <circle cx="12" cy="12" r="10"></circle>
+                                        <line x1="2" y1="12" x2="22" y2="12"></line>
+                                        <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
+                                    </svg>
+                                    {{.}}
+                                </a>
+                                <button class="copy-btn" onclick="copyToClipboard('{{$protocol}}://{{.}}', this)" title="Copiar URL">
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                                        <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                                    </svg>
+                                </button>
+                            </div>
+                            {{end}}
+                        </div>
+                    </div>
+
+                    <div class="app-footer">
+                        <span class="service-tag" title="Serviço: {{.ServiceName}}">
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
+                            </svg>
+                            {{if .ServiceName}}{{.ServiceName}}{{else}}{{.FileName}}{{end}}
+                        </span>
+                        {{if .URLs}}
+                        <a href="{{index .URLs 0}}" target="_blank" rel="noopener noreferrer" class="open-btn">
+                            Abrir
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+                                <polyline points="15 3 21 3 21 9"></polyline>
+                                <line x1="10" y1="14" x2="21" y2="3"></line>
+                            </svg>
+                        </a>
+                        {{end}}
+                    </div>
+                </div>
+                {{end}}
+            {{else}}
+                <div class="empty-state">
+                    <svg viewBox="0 0 24 24" fill="none" stroke-width="1.5">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <line x1="8" y1="12" x2="16" y2="12"></line>
+                    </svg>
+                    <h3>Nenhuma aplicação encontrada</h3>
+                    <p>Certifique-se de que os arquivos de configuração do Traefik estão presentes em <code>/etc/dokploy/traefik/dynamic/</code>.</p>
+                </div>
+            {{end}}
+        </div>
+
+        <footer>
+            Dokploy Applications Hub &bull; Alimentado por <a href="https://dokploy.com" target="_blank">Dokploy</a> &amp; Traefik
+        </footer>
+    </div>
+
+    <script>
+        function filterApps() {
+            const query = document.getElementById('search-input').value.toLowerCase();
+            const cards = document.querySelectorAll('.app-card');
+            let visibleCount = 0;
+
+            cards.forEach(card => {
+                const name = card.getAttribute('data-name').toLowerCase();
+                const domains = card.getAttribute('data-domains').toLowerCase();
+                
+                if (name.includes(query) || domains.includes(query)) {
+                    card.style.display = 'flex';
+                    visibleCount++;
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+
+            const countEl = document.getElementById('app-count');
+            if (countEl) {
+                countEl.textContent = `${visibleCount} Aplicações Exibidas`;
+            }
+        }
+
+        function copyToClipboard(text, btn) {
+            navigator.clipboard.writeText(text).then(() => {
+                const originalHTML = btn.innerHTML;
+                btn.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#34d399" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg>`;
+                setTimeout(() => {
+                    btn.innerHTML = originalHTML;
+                }, 1500);
+            }).catch(err => {
+                console.error('Erro ao copiar: ', err);
+            });
+        }
+    </script>
+</body>
+</html>
