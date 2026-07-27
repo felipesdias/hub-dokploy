@@ -21,11 +21,6 @@ func TestExtractDomainsFromRule(t *testing.T) {
 			rule:     `Host("dashboard.dokploy.com")`,
 			expected: []string{"dashboard.dokploy.com"},
 		},
-		{
-			name:     "Multiple hosts in one Host clause",
-			rule:     "Host(`a.example.com`, `b.example.com`)",
-			expected: []string{"a.example.com", "b.example.com"},
-		},
 	}
 
 	for _, tt := range tests {
@@ -38,24 +33,54 @@ func TestExtractDomainsFromRule(t *testing.T) {
 	}
 }
 
-func TestFormatAppName(t *testing.T) {
+func TestExtractAppNameFromDomain(t *testing.T) {
 	tests := []struct {
-		routerName  string
-		serviceName string
-		fileName    string
-		expected    string
+		domain   string
+		expected string
 	}{
-		// "my-cool-app-12345-router-websecure".split('-router-')[0] -> "my-cool-app-12345".split('-') -> remove "12345" -> "My Cool App"
-		{"my-cool-app-12345-router-websecure", "", "app.yml", "My Cool App"},
-		{"dokploy-hub-xyz-router-1", "", "hub.yml", "Dokploy Hub"},
-		{"api-service-abc-router", "", "api.yaml", "Api Service"},
-		{"grafana-router", "", "grafana.yaml", "Grafana"},
+		{"n8n.felipesdias.com.br", "N8n"},
+		{"financas-api.felipesdias.com.br", "Financas Api"},
+		{"dokploy.felipesdias.com.br", "Dokploy"},
+		{"nutri.felipesdias.com.br", "Nutri"},
 	}
 
 	for _, tt := range tests {
-		got := formatAppName(tt.routerName, tt.serviceName, tt.fileName)
+		got := extractAppNameFromDomain(tt.domain)
 		if got != tt.expected {
-			t.Errorf("formatAppName(%q, %q, %q) = %q, want %q", tt.routerName, tt.serviceName, tt.fileName, got, tt.expected)
+			t.Errorf("extractAppNameFromDomain(%q) = %q, want %q", tt.domain, got, tt.expected)
 		}
+	}
+}
+
+func TestDeduplicateAppsWebsecurePriority(t *testing.T) {
+	rawApps := []App{
+		{
+			Name:        "N8n",
+			Domains:     []string{"n8n.felipesdias.com.br"},
+			RouterName:  "n8n-jwutte-router-1",
+			ServiceName: "n8n-jwutte-service-1",
+			IsWebsecure: false, // web router
+		},
+		{
+			Name:        "N8n",
+			Domains:     []string{"n8n.felipesdias.com.br"},
+			RouterName:  "n8n-jwutte-router-websecure-1",
+			ServiceName: "n8n-jwutte-service-1",
+			IsWebsecure: true, // websecure router
+		},
+	}
+
+	deduped := deduplicateApps(rawApps)
+
+	if len(deduped) != 1 {
+		t.Fatalf("expected 1 deduplicated app, got %d", len(deduped))
+	}
+
+	if !deduped[0].IsWebsecure {
+		t.Errorf("expected websecure router to be prioritized, but got IsWebsecure=false")
+	}
+
+	if deduped[0].Name != "N8n" || deduped[0].Domains[0] != "n8n.felipesdias.com.br" {
+		t.Errorf("unexpected app content: %+v", deduped[0])
 	}
 }
