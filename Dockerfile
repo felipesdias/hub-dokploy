@@ -41,9 +41,9 @@ COPY --from=builder /tmp/hub-dokploy /app/hub-dokploy
 USER appuser:appuser
 
 # Default runtime environment variables
-ENV PORT=8080 \
+ENV PORT=8007 \
     DYNAMIC_CONFIG_DIR=/etc/dokploy/traefik/dynamic
 
-EXPOSE 8080
+EXPOSE 8007
 
 ENTRYPOINT ["/app/hub-dokploy"]

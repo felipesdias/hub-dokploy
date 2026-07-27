@@ -23,7 +23,7 @@ type PageData struct {
 func main() {
 	port := os.Getenv("PORT")
 	if port == "" {
-		port = "8080"
+		port = "8007"
 	}
 
 	configDir := os.Getenv("DYNAMIC_CONFIG_DIR")

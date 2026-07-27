@@ -8,9 +8,9 @@ services:
     container_name: hub-dokploy
     restart: always
     ports:
-      - "8080:8080"
+      - "8007:8007"
     volumes:
       - /etc/dokploy/traefik/dynamic:/etc/dokploy/traefik/dynamic:ro
     environment:
-      - PORT=8080
+      - PORT=8007
       - DYNAMIC_CONFIG_DIR=/etc/dokploy/traefik/dynamic
