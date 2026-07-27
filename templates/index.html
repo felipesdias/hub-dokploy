@@ -19,12 +19,6 @@
             --accent: #38bdf8;
             --text-main: #f8fafc;
             --text-muted: #94a3b8;
-            --badge-https-bg: rgba(16, 185, 129, 0.15);
-            --badge-https-color: #34d399;
-            --badge-https-border: rgba(52, 211, 153, 0.3);
-            --badge-http-bg: rgba(245, 158, 11, 0.15);
-            --badge-http-color: #fbbf24;
-            --badge-http-border: rgba(251, 191, 36, 0.3);
         }
 
         * {
@@ -55,7 +49,6 @@
             flex-direction: column;
             align-items: center;
             text-align: center;
-            position: relative;
         }
 
         .brand {
@@ -193,7 +186,6 @@
             justify-content: space-between;
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             position: relative;
-            overflow: hidden;
         }
 
         .app-card:hover {
@@ -204,16 +196,9 @@
 
         .app-header {
             display: flex;
-            align-items: flex-start;
-            justify-content: space-between;
-            gap: 1rem;
-            margin-bottom: 1rem;
-        }
-
-        .app-info {
-            display: flex;
             align-items: center;
             gap: 0.85rem;
+            margin-bottom: 1.25rem;
         }
 
         .app-avatar {
@@ -237,29 +222,6 @@
             font-weight: 600;
             color: var(--text-main);
             line-height: 1.3;
-        }
-
-        .badge-protocol {
-            padding: 0.25rem 0.6rem;
-            border-radius: 9999px;
-            font-size: 0.75rem;
-            font-weight: 600;
-            letter-spacing: 0.03em;
-            text-transform: uppercase;
-            border: 1px solid;
-            flex-shrink: 0;
-        }
-
-        .badge-https {
-            background: var(--badge-https-bg);
-            color: var(--badge-https-color);
-            border-color: var(--badge-https-border);
-        }
-
-        .badge-http {
-            background: var(--badge-http-bg);
-            color: var(--badge-http-color);
-            border-color: var(--badge-http-border);
         }
 
         .domains-list {
@@ -414,7 +376,7 @@
                 </div>
                 <h1>Dokploy Applications Hub</h1>
             </div>
-            <p class="subtitle">Atalho para todas as aplicações deployadas via Dokploy com domínios configurados</p>
+            <p class="subtitle">Atalho para todas as aplicações deployadas via Dokploy</p>
             <div class="stats-badge">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
                     <circle cx="12" cy="12" r="10"></circle>
@@ -447,20 +409,14 @@
                 <div class="app-card" data-name="{{.Name}}" data-domains="{{range .Domains}}{{.}} {{end}}">
                     <div>
                         <div class="app-header">
-                            <div class="app-info">
-                                <div class="app-avatar">{{slice .Name 0 1}}</div>
-                                <div class="app-title">{{.Name}}</div>
-                            </div>
-                            <span class="badge-protocol {{if .HasTLS}}badge-https{{else}}badge-http{{end}}">
-                                {{if .HasTLS}}HTTPS{{else}}HTTP{{end}}
-                            </span>
+                            <div class="app-avatar">{{slice .Name 0 1}}</div>
+                            <div class="app-title">{{.Name}}</div>
                         </div>
 
                         <div class="domains-list">
-                            {{$protocol := .Protocol}}
                             {{range .Domains}}
                             <div class="domain-item">
-                                <a href="{{$protocol}}://{{.}}" target="_blank" rel="noopener noreferrer" class="domain-link">
+                                <a href="https://{{.}}" target="_blank" rel="noopener noreferrer" class="domain-link">
                                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                         <circle cx="12" cy="12" r="10"></circle>
                                         <line x1="2" y1="12" x2="22" y2="12"></line>
@@ -468,7 +424,7 @@
                                     </svg>
                                     {{.}}
                                 </a>
-                                <button class="copy-btn" onclick="copyToClipboard('{{$protocol}}://{{.}}', this)" title="Copiar URL">
+                                <button class="copy-btn" onclick="copyToClipboard('https://{{.}}', this)" title="Copiar Domínio">
                                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                         <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
                                         <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>

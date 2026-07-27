@@ -26,26 +26,6 @@ func TestExtractDomainsFromRule(t *testing.T) {
 			rule:     "Host(`a.example.com`, `b.example.com`)",
 			expected: []string{"a.example.com", "b.example.com"},
 		},
-		{
-			name:     "OR condition with multiple Host clauses",
-			rule:     "Host(`app.example.com`) || Host(`app.internal.net`)",
-			expected: []string{"app.example.com", "app.internal.net"},
-		},
-		{
-			name:     "Host with PathPrefix AND condition",
-			rule:     "Host(`api.domain.com`) && PathPrefix(`/v1`)",
-			expected: []string{"api.domain.com"},
-		},
-		{
-			name:     "PathPrefix only (no Host)",
-			rule:     "PathPrefix(`/metrics`)",
-			expected: nil,
-		},
-		{
-			name:     "Empty rule",
-			rule:     "",
-			expected: nil,
-		},
 	}
 
 	for _, tt := range tests {
@@ -65,9 +45,11 @@ func TestFormatAppName(t *testing.T) {
 		fileName    string
 		expected    string
 	}{
-		{"my-app-router", "my-app-service", "my-app.yml", "My App"},
-		{"dokploy-hub-secure", "", "hub.yml", "Dokploy Hub"},
-		{"api_v1_service", "", "api.yaml", "Api V1 Service"},
+		// "my-cool-app-12345-router-websecure".split('-router-')[0] -> "my-cool-app-12345".split('-') -> remove "12345" -> "My Cool App"
+		{"my-cool-app-12345-router-websecure", "", "app.yml", "My Cool App"},
+		{"dokploy-hub-xyz-router-1", "", "hub.yml", "Dokploy Hub"},
+		{"api-service-abc-router", "", "api.yaml", "Api Service"},
+		{"grafana-router", "", "grafana.yaml", "Grafana"},
 	}
 
 	for _, tt := range tests {

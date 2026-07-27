@@ -30,11 +30,9 @@ type App struct {
 	Name        string   `json:"name"`
 	Domains     []string `json:"domains"`
 	URLs        []string `json:"urls"`
-	Protocol    string   `json:"protocol"`
 	RouterName  string   `json:"routerName"`
 	ServiceName string   `json:"serviceName"`
 	FileName    string   `json:"fileName"`
-	HasTLS      bool     `json:"hasTls"`
 }
 
 var (
@@ -69,7 +67,6 @@ func ParseDirectory(dirPath string) ([]App, error) {
 		filePath := filepath.Join(dirPath, entry.Name())
 		parsedApps, err := parseConfigFile(filePath, entry.Name())
 		if err != nil {
-			// Log error or skip unparseable file silently
 			fmt.Printf("Warning: failed to parse %s: %v\n", filePath, err)
 			continue
 		}
@@ -113,15 +110,9 @@ func parseConfigFile(filePath, fileName string) ([]App, error) {
 			continue
 		}
 
-		hasTLS := router.TLS != nil || hasWebsecureEntryPoint(router.EntryPoints)
-		protocol := "http"
-		if hasTLS {
-			protocol = "https"
-		}
-
 		urls := make([]string, len(domains))
 		for i, d := range domains {
-			urls[i] = fmt.Sprintf("%s://%s", protocol, d)
+			urls[i] = fmt.Sprintf("https://%s", d)
 		}
 
 		appName := formatAppName(routerName, router.Service, fileName)
@@ -130,11 +121,9 @@ func parseConfigFile(filePath, fileName string) ([]App, error) {
 			Name:        appName,
 			Domains:     domains,
 			URLs:        urls,
-			Protocol:    protocol,
 			RouterName:  routerName,
 			ServiceName: router.Service,
 			FileName:    fileName,
-			HasTLS:      hasTLS,
 		})
 	}
 
@@ -155,7 +144,6 @@ func extractDomainsFromRule(rule string) []string {
 		if len(match) < 2 {
 			continue
 		}
-		// raw inside Host(...) e.g. `domain1.com`, `domain2.com`
 		rawContent := match[1]
 		parts := strings.Split(rawContent, ",")
 		for _, p := range parts {
@@ -170,18 +158,8 @@ func extractDomainsFromRule(rule string) []string {
 	return domains
 }
 
-// hasWebsecureEntryPoint checks if websecure or https entrypoint is set
-func hasWebsecureEntryPoint(entryPoints []string) bool {
-	for _, ep := range entryPoints {
-		epLower := strings.ToLower(ep)
-		if epLower == "websecure" || epLower == "https" {
-			return true
-		}
-	}
-	return false
-}
-
-// formatAppName generates a clean human-readable application name
+// formatAppName parses the app name matching the requested logic:
+// parts = name.split('-router-')[0].split('-') -> remove last element if len > 1 -> join
 func formatAppName(routerName, serviceName, fileName string) string {
 	raw := routerName
 	if raw == "" {
@@ -191,26 +169,27 @@ func formatAppName(routerName, serviceName, fileName string) string {
 		raw = strings.TrimSuffix(fileName, filepath.Ext(fileName))
 	}
 
-	// Remove common traefik suffixes
-	raw = strings.TrimSuffix(raw, "-router")
-	raw = strings.TrimSuffix(raw, "-rtr")
-	raw = strings.TrimSuffix(raw, "-secure")
-	raw = strings.TrimSuffix(raw, "-web")
+	// 1. split('-router-')[0]
+	if idx := strings.Index(raw, "-router-"); idx != -1 {
+		raw = raw[:idx]
+	} else if idx := strings.Index(raw, "-router"); idx != -1 {
+		raw = raw[:idx]
+	}
 
-	// Format dashes/underscores to spaces or clean name
-	parts := strings.FieldsFunc(raw, func(r rune) bool {
-		return r == '-' || r == '_' || r == '.'
-	})
+	// 2. split('-')
+	parts := strings.Split(raw, "-")
 
+	// 3. Remove last part if there are multiple parts
+	if len(parts) > 1 {
+		parts = parts[:len(parts)-1]
+	}
+
+	// 4. Title case and join remaining parts
 	for i, part := range parts {
 		if len(part) > 0 {
 			parts[i] = strings.Title(part)
 		}
 	}
 
-	formatted := strings.Join(parts, " ")
-	if formatted == "" {
-		return raw
-	}
-	return formatted
+	return strings.Join(parts, " ")
 }
