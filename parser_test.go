@@ -39,7 +39,7 @@ func TestExtractAppNameFromDomain(t *testing.T) {
 		expected string
 	}{
 		{"n8n.felipesdias.com.br", "N8n"},
-		{"financas-api.felipesdias.com.br", "Financas Api"},
+		{"finance-api.felipesdias.com.br", "Finance Api"},
 		{"dokploy.felipesdias.com.br", "Dokploy"},
 		{"nutri.felipesdias.com.br", "Nutri"},
 	}

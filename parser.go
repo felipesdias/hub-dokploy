@@ -139,8 +139,8 @@ func parseConfigFile(filePath, fileName string) ([]App, error) {
 }
 
 // extractAppNameFromDomain splits the domain by '.' and takes the first part (subdomain)
-// Example: "n8n.felipesdias.com.br" -> "N8n"
-// Example: "financas-api.felipesdias.com.br" -> "Financas Api"
+// Example: "n8n.example.com" -> "N8n"
+// Example: "finance-api.example.com" -> "Finance Api"
 func extractAppNameFromDomain(domain string) string {
 	parts := strings.Split(domain, ".")
 	if len(parts) == 0 || parts[0] == "" {

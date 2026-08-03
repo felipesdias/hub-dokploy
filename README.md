@@ -1,45 +1,45 @@
 # Hub Dokploy 🚀
 
-Uma aplicação extremamente leve desenvolvida em Go (Golang) que serve como **HUB central de atalhos** para todas as suas aplicações hospedadas no **Dokploy**.
+An extremely lightweight application developed in Go (Golang) that serves as a **central shortcut HUB** for all your applications hosted on **Dokploy**.
 
-Ela varre dinamicamente os arquivos de configuração do Traefik em `/etc/dokploy/traefik/dynamic/` e gera automaticamente um painel moderno e responsivo com links diretos para cada aplicação com domínio configurado.
-
----
-
-## ✨ Funcionalidades
-
-- ⚡ **Ultra Leve**: Consome menos de 10 MB de memória RAM e binary estático compilado em Go.
-- 🎨 **Interface Moderna (Dark Mode)**: Painel elegante com efeito Glassmorphism, busca em tempo real e badges de protocolo (HTTPS/HTTP).
-- 🔍 **Filtro em Tempo Real**: Campo de busca instantâneo para filtrar aplicações por nome ou domínio.
-- 📋 **Copiar URLs com 1 Clique**: Botões práticos para copiar o link da aplicação diretamente para a área de transferência.
-- 🐋 **Containerizada**: Multi-stage Dockerfile pronto para deploy direto no Dokploy ou Docker Swarm.
-- 🔄 **Atualização Dinâmica**: Lê as configurações do Traefik direto da pasta montada, sem necessidade de banco de dados.
+It dynamically scans Traefik configuration files in `/etc/dokploy/traefik/dynamic/` and automatically generates a modern, responsive dashboard with direct links to each application with a configured domain.
 
 ---
 
-## 🛠️ Como Funciona
+## ✨ Features
 
-O Dokploy armazena as rotas dinâmicas do Traefik no diretório host `/etc/dokploy/traefik/dynamic/`. O **Hub Dokploy** lê esses arquivos (`.yml`, `.yaml`, `.json`), extrai as regras de domínio do Traefik (`Host(...)`), mapeia o protocolo (HTTPS/HTTP) e gera a listagem automaticamente.
+- ⚡ **Ultra Lightweight**: Consumes less than 10 MB of RAM with a static binary compiled in Go.
+- 🎨 **Modern Interface (Dark Mode)**: Sleek dashboard with Glassmorphism effect, real-time search, and protocol badges (HTTPS/HTTP).
+- 🔍 **Real-Time Filter**: Instant search input to filter applications by name or domain.
+- 📋 **1-Click URL Copy**: Convenient buttons to copy application links directly to the clipboard.
+- 🐋 **Containerized**: Multi-stage Dockerfile ready for direct deployment on Dokploy or Docker Swarm.
+- 🔄 **Dynamic Updates**: Reads Traefik configurations directly from the mounted directory without needing a database.
 
 ---
 
-## 🚀 Como Fazer Deploy no Dokploy
+## 🛠️ How It Works
 
-### Opção 1: Via Dockerfile (Recomendado no Dokploy)
+Dokploy stores Traefik dynamic routes in the host directory `/etc/dokploy/traefik/dynamic/`. **Hub Dokploy** reads these files (`.yml`, `.yaml`, `.json`), extracts domain rules from Traefik (`Host(...)`), maps the protocol (HTTPS/HTTP), and automatically generates the application listing.
 
-1. Crie uma nova aplicação no Dokploy apontando para o seu repositório Git.
-2. Selecione o **Provider: Dockerfile**.
-3. Em **Volumes**, adicione o seguinte mapeamento de volume host:
+---
+
+## 🚀 How to Deploy on Dokploy
+
+### Option 1: Via Dockerfile (Recommended on Dokploy)
+
+1. Create a new application in Dokploy pointing to your Git repository.
+2. Select **Provider: Dockerfile**.
+3. Under **Volumes**, add the following host volume mapping:
    - **Host Path**: `/etc/dokploy/traefik/dynamic`
    - **Container Path**: `/etc/dokploy/traefik/dynamic`
    - **Mode**: `ro` (Read Only)
-4. Clique em **Deploy**.
+4. Click **Deploy**.
 
 ---
 
-### Opção 2: Via Docker Compose
+### Option 2: Via Docker Compose
 
-Você também pode utilizar o arquivo `docker-compose.yml` incluído:
+You can also use the included `docker-compose.yml` file:
 
 ```yaml
 version: '3.8'
@@ -62,24 +62,24 @@ services:
 
 ---
 
-## ⚙️ Variáveis de Ambiente
+## ⚙️ Environment Variables
 
-| Variável | Padrão | Descrição |
+| Variable | Default | Description |
 | :--- | :--- | :--- |
-| `PORT` | `8007` | Porta onde o servidor HTTP irá escutar |
-| `DYNAMIC_CONFIG_DIR` | `/etc/dokploy/traefik/dynamic` | Caminho do diretório de configurações dinâmicas do Traefik |
+| `PORT` | `8007` | Port where the HTTP server will listen |
+| `DYNAMIC_CONFIG_DIR` | `/etc/dokploy/traefik/dynamic` | Path to the Traefik dynamic configuration directory |
 
 ---
 
-## 💻 Desenvolvimento Local
+## 💻 Local Development
 
 ```bash
-# Instalar dependências
+# Install dependencies
 go mod download
 
-# Executar testes unitários
+# Run unit tests
 go test -v ./...
 
-# Compilar e rodar a aplicação localmente (usando diretório de teste ou padrão)
-DYNAMIC_CONFIG_DIR=./test_config go run .
+# Build and run the application locally (using test directory or default)
+DYNAMIC_CONFIG_DIR=./test_configs go run .
 ```
